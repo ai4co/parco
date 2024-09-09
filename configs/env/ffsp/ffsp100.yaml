@@ -1,0 +1,15 @@
+# @package _global_
+defaults:
+  - _self_
+
+trainer:
+  max_epochs: 200
+
+env:
+  _target_: parco.envs.ffsp.FFSPEnv
+  name: ffsp
+
+  generator_params:
+    num_stage: 3
+    num_machine: 4
+    num_job: 100

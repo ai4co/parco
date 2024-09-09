@@ -1,0 +1,27 @@
+_target_: parco.envs.hcvrp.HCVRPEnv
+name: hcvrp
+
+generator_params:
+  num_loc: 100 # max locs
+  num_agents: 7 # min locs
+
+data_dir: ${paths.root_dir}/data/${env.name}
+
+# Note that validation is not used for guiding training and this is already the test set
+# so we can directly check the progress here!
+val_file: [
+  "n60_m3_seed24610.npz", "n60_m5_seed24610.npz", "n60_m7_seed24610.npz",
+  "n80_m3_seed24610.npz", "n80_m5_seed24610.npz", "n80_m7_seed24610.npz",
+  "n100_m3_seed24610.npz", "n100_m5_seed24610.npz", "n100_m7_seed24610.npz",
+]
+
+# Note: we take the number of agents "m" from here directly!
+val_dataloader_names: [
+  "n60_m3", "n60_m5", "n60_m7",
+  "n80_m3", "n80_m5", "n80_m7",
+  "n100_m3", "n100_m5", "n100_m7",
+  ]
+
+test_file: ${env.val_file}
+
+test_dataloader_names: ${env.val_dataloader_names}

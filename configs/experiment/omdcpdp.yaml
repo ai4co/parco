@@ -1,0 +1,74 @@
+# @package _global_
+
+# Override defaults: take configs from relative path
+defaults:
+  - override /model: parco.yaml
+  - override /env: omdcpdp.yaml
+  - override /callbacks: default.yaml
+  - override /trainer: default.yaml
+  # - override /logger: null # comment this line to enable logging
+  - override /logger: wandb.yaml
+
+env:
+  generator_params:
+    num_loc: 100 # max locs
+    num_agents: 50 # min locs
+
+
+# Model hyperparameters
+model:
+  policy: # note: all other arguments (e.g. embeddings) are automatically taken from the env
+    # otherwise, you may pass init_embedding / context_embedding (example below)
+    _target_: "parco.models.policy.PARCOPolicy"
+    env_name: "${env.name}"
+    agent_handler: "highprob"
+    embed_dim: 128
+    norm_after: false # true means we use Kool structure, which seems slightly worse
+    normalization: "rms"
+    use_final_norm: false
+    parallel_gated_kwargs:
+      mlp_activation: "silu" # use MLP as in LLaMa
+    context_embedding_kwargs:
+      normalization: "rms"
+      norm_after: false # true means we use Kool structure, which seems slightly worse
+      use_final_norm: false
+      parallel_gated_kwargs:
+        mlp_activation: "silu"
+  batch_size: 128
+  val_batch_size: ${model.batch_size}
+  test_batch_size: ${model.batch_size}
+  train_data_size: 100_000
+  val_data_size: 10_000
+  test_data_size: 10_000
+  optimizer_kwargs:
+    lr: 1e-4
+    weight_decay: 0.0
+  lr_scheduler:
+    "MultiStepLR"
+  lr_scheduler_kwargs:
+    milestones: [80, 95]
+    gamma: 0.1
+  num_augment: 8
+  train_min_agents: 10
+  train_max_agents: ${env.generator_params.num_agents} # max agents is the number of agents
+  train_min_size: 50
+  train_max_size: ${env.generator_params.num_loc} # max size is the number of locations
+
+# Logging: we use Wandb in this case
+logger:
+  wandb:
+    project: "parco-${env.name}"
+    tags: ["parco", "${env.name}", "communication"]
+    group: "${env.name}_n${env.generator_params.num_loc}_m${env.generator_params.num_agents}"
+    name: "parco"
+
+# Trainer: this is a customized version of the PyTorch Lightning trainer.
+trainer:
+  max_epochs: 100
+
+seed: 1234
+
+# Used to save the best model. However, we are not using this in the current setup
+callbacks:
+  model_checkpoint:
+    monitor: "val/reward/n100_m35"

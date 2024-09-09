@@ -1,0 +1,24 @@
+_target_: parco.envs.omdcpdp.env.OMDCPDPEnv
+name: omdcpdp
+reward_mode: "lateness"
+
+generator_params:
+  num_loc: 100 # changed to accomodate the new data
+  num_agents: 30
+
+data_dir: ${paths.root_dir}/data/${env.name}
+
+val_file: ["n50_m5_seed3333.npz", "n50_m10_seed3333.npz", "n50_m15_seed3333.npz",
+  "n100_m10_seed3333.npz", "n100_m20_seed3333.npz", "n100_m30_seed3333.npz",
+  "n200_m20_seed3333.npz", "n200_m40_seed3333.npz", "n200_m60_seed3333.npz",
+]
+
+val_dataloader_names: [
+  "n50_m5", "n50_m10", "n50_m20",
+  "n100_m10", "n100_m20", "n100_m30",
+  "n200_m20", "n200_m40", "n200_m60",
+]
+
+test_file: ${env.val_file}
+
+test_dataloader_names: ${env.val_dataloader_names}

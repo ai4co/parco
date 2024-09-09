@@ -1,0 +1,86 @@
+defaults:
+  - _self_
+  - env: ffsp50
+
+
+model:
+  machine_cnt_list: ${env.machine_cnt_list}
+  pomo_size: ${env.pomo_size}
+  embedding_dim: 256
+  encoder_layer_num: 3
+  normalization: "instance"
+  norm_after: False
+  qkv_dim: 16
+  head_num: 16
+  logit_clipping: 10
+  ff_hidden_dim: 512
+  ms_hidden_dim: 16
+  scale_factor: 10
+  eval_type: 'softmax'
+  one_hot_seed_cnt: 4  # must be >= machine_cnt
+  use_comm_layer: True
+  use_graph_proj: False
+  use_ham: True
+  use_decoder_mha_mask: True
+  scale_dots: True
+  use_pos_token: True
+
+
+train:
+  use_cuda: True
+  cuda_device_num: 5
+  train_episodes: 1000
+  train_batch_size: 50
+  accumulation_steps: 1
+  max_grad_norm: 1
+  logging:
+    model_save_interval: 100
+    img_save_interval: 100
+    log_image_params_1:
+      json_foldername: 'log_image_style'
+      filename: 'style.json'
+    log_image_params_2:
+      json_foldername: 'log_image_style'
+      filename: 'style_loss.json'
+
+
+optimizer:
+  optimizer:
+    lr: 1e-4
+    weight_decay: 1e-6
+  scheduler:
+    # class: "exponential"
+    # kwargs:
+    #   gamma: 0.98
+    # class: "multistep"
+    # kwargs:
+    #   milestones: [60, 90, 120, 150]
+    #   gamma: 0.3
+    class: "cos"
+    kwargs:
+      T_max: ${train.epochs}
+      eta_min: 0.0000001
+
+
+test:
+  saved_problem_folder: "../data"
+  saved_problem_filename: "unrelated_10000_problems_${env.ma_cnt_str}_job${env.job_cnt}_2_10.pt"
+  problem_count: 1000
+  test_batch_size: 50
+  augmentation_enable: False
+  aug_factor: 128
+
+
+logger:
+  log_file: 
+      desc: 'matnet_train'
+      filename: 'log.txt'
+
+# hydra:
+#   run:
+#     dir: ${ROOTDIR:}/outputs/${instance.num_jobs}-${instance.num_machines}/runs/${model.model_type}/${now:%Y-%m-%d}/${now:%H-%M-%S}-0
+#   sweep:
+#     dir: ${ROOTDIR:}/outputs/${instance.num_jobs}-${instance.num_machines}/runs/${model.model_type}/${now:%Y-%m-%d}
+#     subdir: ${now:%H-%M-%S}-${hydra:job.num}
+#   launcher:
+#     n_jobs: ${num_jobs:${train.first_gpu}}
