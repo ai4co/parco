@@ -49,5 +49,7 @@ if __name__ == "__main__":
 
     problem = "omdcpdp"
     print(50 * "=" + f"\nGenerating instances for {problem.upper()}...\n" + 50 * "=")
-    size_agents_dict = {50: [5, 10, 15], 100: [10, 20, 30], 200: [20, 40, 60]}
+    # Note: results may differ slightly due to the different distribution we used, except for the provided Seoul dataset
+    # if needed, you may contact us for the exact distribution we used (it was created in PyTorch, hence not deterministic)
+    size_agents_dict = {50: [10, 18, 25], 100: [20, 35, 50], 200: [40, 70, 100]} 
     generate_with_agents(problem, size_agents_dict, **kwargs)
