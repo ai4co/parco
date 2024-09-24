@@ -64,10 +64,16 @@ Note on legacy FFSP code: the initial version we made was not yet integrated in 
 
 ### Testing
 
-You may run the `test.py` script to evaluate the model, e.g. with:
+You may run the `test.py` script to evaluate the model, e.g. with greedy decoding:
 
 ```bash
-python test.py --problem hcvrp --decode_type greedy --batch_size 128 --sample_size 1
+python test.py --problem hcvrp --decode_type greedy --batch_size 128
+```
+
+(note: we measure time with single instance -- batch size 1, but larger makes the overall evaluation faster), or with sampling:
+
+```bash
+python test.py --problem hcvrp --decode_type sampling --batch_size 1 --sample_size 1280
 ```
 
 
